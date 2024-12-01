@@ -1,38 +1,41 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: UTSA
-// Engineer: Morton
-//
-// Create Date: 11/08/2024 02:33:37 PM
-//////////////////////////////////////////////////////////////////////////////////
 
 module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
-    input clk100;
-    input [15:0] sw;
-    output [7:0] seg;
-    output [7:0] disp;
-    output PWM;
+    input clk100; //updater clock
+    input [15:0] sw; //Switches for control
+    output [7:0] seg; //displays
+    output [7:0] disp; //individual displays
+    output PWM; //pulse signal
     output Trig;
     input Echo;
     //output red1;
     output TestA1;
+    
+    wire [15:0] output_signal;
     reg [31:0] count;
     reg [3:0] NextState;
     wire [3:0] State;
     reg RTrig;
     reg [31:0] RPeriod;
     wire [31:0] Period;
+    reg [15:0] Kp;
+    reg [15:0] Ki;
+    reg [15:0] Kd;
 
     assign State = NextState;
     assign Trig = RTrig;
 
     initial begin
         NextState <= 4'h0;
+        Kp <= 16'd1;
+        Ki <= 16'd1;
+        Kd <= 16'd1;
     end
 
     assign TestA1 = count[19];
 
-    PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM); // Replace the concatenation with the PID output
+    PWM_Gen IN105 (clk100, output_signal, PWM); // Replace the concatenation with the PID output
+    PID_Controller IN107 (clk100, 1'b0, 20'h16598, RPeriod, Kp, Ki, Kd, clk100, output_signal);
 
     always @(posedge clk100) begin // State machine for the project
         count <= count + 1;
@@ -60,10 +63,65 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
         endcase
     end
 
-    SSEG IN106 (seg, disp, clk100, RPeriod);
+    SSEG IN106 (seg, disp, clk100, RPeriod); //RPeriod is the value
+    
 endmodule
 
 // ***********************************************************
+
+module PID_Controller(
+    input  clk,
+    input  rst_n,
+    input  [15:0] setpoint,
+    input  [15:0] feedback, //ball distance
+    input  [15:0] Kp,
+    input  [15:0] Ki,
+    input  [15:0] Kd,
+    input  [15:0] clk_prescaler,
+    output reg [15:0] control_signal
+);
+    // Internal signals
+    
+    reg [15:0] prev_error = 16'h0000;
+    reg [15:0] integral = 32'h00000000;
+    reg [15:0] derivative = 16'h0000;
+    
+    // Clock divider for sampling rate
+    reg [15:0] clk_divider = 0;
+    reg sampling_flag = 0;
+
+    always @(posedge clk or negedge rst_n) begin
+    //$display("Clock trigered");
+        if (~rst_n)
+            clk_divider <= 16'h0000;
+        else if (clk_divider == clk_prescaler) begin // clk_prescaler determines the sampling rate, thus sampling rate would be clk freq/clk_prescaler
+            clk_divider <= 16'h0000;
+            
+            sampling_flag <= 1;
+        end else begin
+            clk_divider <= clk_divider + 1;
+            sampling_flag <= 0;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+    
+        if (~rst_n) begin
+            // Reset logic generally specific to application
+            
+        end 
+        else if (sampling_flag) begin
+                      
+            // PID Calculation
+            integral <= integral + (Ki * (setpoint - feedback));
+            $display("Integral is %d",integral);
+            derivative <= Kd * ((setpoint - feedback) - prev_error);
+            // Calculate control signal
+            control_signal = (Kp * (setpoint - feedback)) + integral + derivative; 
+            prev_error <= (setpoint - feedback); // Update previous error term to feed it for derrivative term.
+        end
+    end
+endmodule
 
 module PWM_Gen(clk100, Input, PWM_Pulse);
     input clk100;
