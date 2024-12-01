@@ -6,7 +6,7 @@
 // Create Date: 11/08/2024 02:33:37 PM
 //////////////////////////////////////////////////////////////////////////////////
 
-module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, red1, TestA1);
+module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     input clk100;
     input [15:0] sw;
     output [7:0] seg;
@@ -14,7 +14,7 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, red1, TestA1);
     output PWM;
     output Trig;
     input Echo;
-    output red1;
+    //output red1;
     output TestA1;
     reg [31:0] count;
     reg [3:0] NextState;

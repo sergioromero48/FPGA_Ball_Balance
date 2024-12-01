@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.1 (64-bit)
+# SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
+# IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+# SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+# Start of session at: Sat Nov 30 23:51:13 2024
+# Process ID: 19320
+# Current directory: C:/Users/sergi/DSD_FINAL_Project/DSD_FINAL_Project.runs/synth_1
+# Command line: vivado.exe -log BBa.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source BBa.tcl
+# Log file: C:/Users/sergi/DSD_FINAL_Project/DSD_FINAL_Project.runs/synth_1/BBa.vds
+# Journal file: C:/Users/sergi/DSD_FINAL_Project/DSD_FINAL_Project.runs/synth_1\vivado.jou
+# Running On        :Marvin
+# Platform          :Windows Server 2016 or Windows 10
+# Operating System  :22631
+# Processor Detail  :Intel(R) Core(TM) Ultra 9 185H
+# CPU Frequency     :3072 MHz
+# CPU Physical cores:16
+# CPU Logical cores :22
+# Host memory       :25095 MB
+# Swap memory       :5905 MB
+# Total Virtual     :31001 MB
+# Available Virtual :16785 MB
+#-----------------------------------------------------------
+source BBa.tcl -notrace
