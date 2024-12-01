@@ -36,8 +36,12 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     end
 
     assign TestA1 = count[19];
-
-    PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM); // Replace the concatenation with the PID output
+    
+    reg [31:0] SetPoint = 32'h00020590;
+    reg [31:0] Kp = 32'h000050000;
+    reg [31:0] Ki = 32'h000000100;
+    reg [31:0] Kd = 32'h000005000;
+    
 
     always @(posedge clk100) begin // State machine for the project
         count <= count + 1;
@@ -71,7 +75,11 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     wire [31:0] OPeriod;
     // Moving Average Filter for Stable PID and Sensor reading
     moving_avg m0 ( clk100, RPeriod_valid, RPeriod_latched, OPeriod );
-
+    // PID Controller
+    PID_Controller PID ( clk100, rst_n, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
+    // PWM Generator
+    PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM);
+    
     SSEG IN106 (seg, disp, clk100, OPeriod);
 endmodule
 
@@ -199,7 +207,7 @@ module CLK100MHZ_divider(clk100, New_Clock);
 
     always @(posedge clk100) begin
         count <= count + 1;
-        if (count == 31'd5_000) begin
+        if (count == 31'd2_500) begin
             New_Clock <= ~New_Clock; // Toggle New Clock
             count <= 31'b0; // Reset count
         end
@@ -240,6 +248,64 @@ module moving_avg (
         end
     end
 endmodule
+// PID_Controller PID ( clk100, rst_n, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
+module PID_Controller(
+    input  wire         clk,
+    input  wire         rst_n,
+    input  wire signed [31:0] setpoint,
+    input  wire signed [31:0] feedback,       // Ball distance
+    input  wire signed [31:0] Kp,
+    input  wire signed [31:0] Ki,
+    input  wire signed [31:0] Kd,
+    input  wire         RPeriod_valid,        // New input signal
+    output reg  signed [31:0] control_signal
+);
+    // Internal signals
+    reg signed [31:0] prev_error    = 32'sd0;
+    reg signed [63:0] integral      = 64'sd0;  // Increased width to prevent overflow
+    reg signed [31:0] derivative    = 32'sd0;
 
+    // Variables used in always block
+    reg signed [31:0] error;
+    reg signed [63:0] P_term;
+    reg signed [63:0] PID_sum;
 
+    // PID computation
+    always @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            // Reset logic
+            prev_error     <= 32'sd0;
+            integral       <= 64'sd0;
+            derivative     <= 32'sd0;
+            control_signal <= 32'sd0;
+        end else if (RPeriod_valid) begin
+            // Calculate error
+            error <= setpoint - feedback;
+
+            // Proportional term
+            P_term <= Kp * error;
+
+            // Integral term
+            integral <= integral + (Ki * error);
+
+            // Derivative term
+            derivative <= Kd * (error - prev_error);
+
+            // Update previous error
+            prev_error <= error;
+
+            // Calculate control signal
+            // Sum P, I, D terms and truncate to 32 bits if necessary
+            PID_sum <= P_term + integral + derivative;
+
+            // Assign control signal with saturation to prevent overflow
+            if (PID_sum > 32'sh7FFFFFFF)
+                control_signal <= 32'sh7FFFFFFF;
+            else if (PID_sum < -32'sh80000000)
+                control_signal <= -32'sh80000000;
+            else
+                control_signal <= PID_sum[31:0];  // Truncate to 32 bits
+        end
+    end
+endmodule
 

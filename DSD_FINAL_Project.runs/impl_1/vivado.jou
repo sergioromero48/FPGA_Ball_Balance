@@ -3,8 +3,8 @@
 # SW Build 5076996 on Wed May 22 18:37:14 MDT 2024
 # IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
 # SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
-# Start of session at: Sun Dec  1 04:21:35 2024
-# Process ID: 9208
+# Start of session at: Sun Dec  1 04:36:29 2024
+# Process ID: 3192
 # Current directory: C:/Users/sergi/DSD_FINAL_Project/DSD_FINAL_Project.runs/impl_1
 # Command line: vivado.exe -log BBa.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source BBa.tcl -notrace
 # Log file: C:/Users/sergi/DSD_FINAL_Project/DSD_FINAL_Project.runs/impl_1/BBa.vdi
@@ -19,6 +19,6 @@
 # Host memory       :25095 MB
 # Swap memory       :5905 MB
 # Total Virtual     :31001 MB
-# Available Virtual :14762 MB
+# Available Virtual :15139 MB
 #-----------------------------------------------------------
 source BBa.tcl -notrace

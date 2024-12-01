@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
-| Date         : Sun Dec  1 04:22:22 2024
+| Date         : Sun Dec  1 04:37:19 2024
 | Host         : Marvin running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -max_paths 10 -report_unconstrained -file BBa_timing_summary_routed.rpt -pb BBa_timing_summary_routed.pb -rpx BBa_timing_summary_routed.rpx -warn_on_violation
 | Design       : BBa
@@ -1536,7 +1536,7 @@ Slack:                    inf
                             (output port)
   Path Group:             (none)
   Path Type:              Max at Slow Process Corner
-  Data Path Delay:        17.396ns  (logic 7.122ns (40.939%)  route 10.274ns (59.061%))
+  Data Path Delay:        17.378ns  (logic 7.250ns (41.718%)  route 10.128ns (58.282%))
   Logic Levels:           13  (CARRY4=9 IBUF=1 LUT2=1 LUT6=1 OBUF=1)
 
     Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
@@ -1549,35 +1549,35 @@ Slack:                    inf
                          net (fo=1, routed)           0.000     6.589    IN105/RInput1_carry__0_i_4_n_0
     SLICE_X0Y70          CARRY4 (Prop_carry4_S[2]_CO[3])
                                                       0.398     6.987 r  IN105/RInput1_carry__0/CO[3]
-                         net (fo=16, routed)          1.815     8.802    IN105/RInput1
-    SLICE_X2Y67          LUT6 (Prop_lut6_I3_O)        0.124     8.926 r  IN105/PWM_Pulse0_carry_i_2/O
-                         net (fo=1, routed)           0.568     9.494    IN105/PWM_Pulse0_carry_i_2_n_0
-    SLICE_X3Y67          CARRY4 (Prop_carry4_DI[2]_CO[3])
-                                                      0.398     9.892 r  IN105/PWM_Pulse0_carry/CO[3]
-                         net (fo=1, routed)           0.000     9.892    IN105/PWM_Pulse0_carry_n_0
+                         net (fo=16, routed)          1.766     8.753    IN105/RInput1
+    SLICE_X2Y67          LUT6 (Prop_lut6_I3_O)        0.124     8.877 r  IN105/PWM_Pulse0_carry_i_4/O
+                         net (fo=1, routed)           0.471     9.348    IN105/PWM_Pulse0_carry_i_4_n_0
+    SLICE_X3Y67          CARRY4 (Prop_carry4_DI[0]_CO[3])
+                                                      0.526     9.874 r  IN105/PWM_Pulse0_carry/CO[3]
+                         net (fo=1, routed)           0.000     9.874    IN105/PWM_Pulse0_carry_n_0
     SLICE_X3Y68          CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114    10.006 r  IN105/PWM_Pulse0_carry__0/CO[3]
-                         net (fo=1, routed)           0.000    10.006    IN105/PWM_Pulse0_carry__0_n_0
+                                                      0.114     9.988 r  IN105/PWM_Pulse0_carry__0/CO[3]
+                         net (fo=1, routed)           0.000     9.988    IN105/PWM_Pulse0_carry__0_n_0
     SLICE_X3Y69          CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114    10.120 r  IN105/PWM_Pulse0_carry__1/CO[3]
-                         net (fo=1, routed)           0.000    10.120    IN105/PWM_Pulse0_carry__1_n_0
+                                                      0.114    10.102 r  IN105/PWM_Pulse0_carry__1/CO[3]
+                         net (fo=1, routed)           0.000    10.102    IN105/PWM_Pulse0_carry__1_n_0
     SLICE_X3Y70          CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114    10.234 r  IN105/PWM_Pulse0_carry__2/CO[3]
-                         net (fo=1, routed)           0.000    10.234    IN105/PWM_Pulse0_carry__2_n_0
+                                                      0.114    10.216 r  IN105/PWM_Pulse0_carry__2/CO[3]
+                         net (fo=1, routed)           0.000    10.216    IN105/PWM_Pulse0_carry__2_n_0
     SLICE_X3Y71          CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114    10.348 r  IN105/PWM_Pulse0_carry__3/CO[3]
-                         net (fo=1, routed)           0.000    10.348    IN105/PWM_Pulse0_carry__3_n_0
+                                                      0.114    10.330 r  IN105/PWM_Pulse0_carry__3/CO[3]
+                         net (fo=1, routed)           0.000    10.330    IN105/PWM_Pulse0_carry__3_n_0
     SLICE_X3Y72          CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114    10.462 r  IN105/PWM_Pulse0_carry__4/CO[3]
-                         net (fo=1, routed)           0.000    10.462    IN105/PWM_Pulse0_carry__4_n_0
+                                                      0.114    10.444 r  IN105/PWM_Pulse0_carry__4/CO[3]
+                         net (fo=1, routed)           0.000    10.444    IN105/PWM_Pulse0_carry__4_n_0
     SLICE_X3Y73          CARRY4 (Prop_carry4_CI_CO[3])
-                                                      0.114    10.576 r  IN105/PWM_Pulse0_carry__5/CO[3]
-                         net (fo=1, routed)           0.000    10.576    IN105/PWM_Pulse0_carry__5_n_0
+                                                      0.114    10.558 r  IN105/PWM_Pulse0_carry__5/CO[3]
+                         net (fo=1, routed)           0.000    10.558    IN105/PWM_Pulse0_carry__5_n_0
     SLICE_X3Y74          CARRY4 (Prop_carry4_CI_CO[1])
-                                                      0.157    10.733 r  IN105/PWM_Pulse0_carry__6/CO[1]
-                         net (fo=1, routed)           2.893    13.626    PWM_OBUF
-    C17                  OBUF (Prop_obuf_I_O)         3.770    17.396 r  PWM_OBUF_inst/O
-                         net (fo=0)                   0.000    17.396    PWM
+                                                      0.157    10.715 r  IN105/PWM_Pulse0_carry__6/CO[1]
+                         net (fo=1, routed)           2.893    13.608    PWM_OBUF
+    C17                  OBUF (Prop_obuf_I_O)         3.770    17.378 r  PWM_OBUF_inst/O
+                         net (fo=0)                   0.000    17.378    PWM
     C17                                                               r  PWM (OUT)
   -------------------------------------------------------------------    -------------------
 
