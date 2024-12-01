@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
-| Date             : Sat Nov 30 23:52:45 2024
+| Date             : Sun Dec  1 04:22:22 2024
 | Host             : Marvin running 64-bit major release  (build 9200)
 | Command          : report_power -file BBa_power_routed.rpt -pb BBa_power_summary_routed.pb -rpx BBa_power_routed.rpx
 | Design           : BBa
@@ -30,7 +30,7 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.101        |
+| Total On-Chip Power (W)  | 0.102        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
 | Dynamic (W)              | 0.004        |
@@ -53,15 +53,16 @@ Table of Contents
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |     0.002 |        3 |       --- |             --- |
-| Slice Logic    |    <0.001 |      366 |       --- |             --- |
-|   LUT as Logic |    <0.001 |      117 |     63400 |            0.18 |
-|   CARRY4       |    <0.001 |       54 |     15850 |            0.34 |
-|   Register     |    <0.001 |      166 |    126800 |            0.13 |
-|   Others       |     0.000 |        8 |       --- |             --- |
-| Signals        |    <0.001 |      273 |       --- |             --- |
+| Slice Logic    |    <0.001 |      591 |       --- |             --- |
+|   LUT as Logic |    <0.001 |      196 |     63400 |            0.31 |
+|   CARRY4       |    <0.001 |       67 |     15850 |            0.42 |
+|   Register     |    <0.001 |      289 |    126800 |            0.23 |
+|   F7/F8 Muxes  |    <0.001 |        4 |     63400 |           <0.01 |
+|   Others       |     0.000 |        9 |       --- |             --- |
+| Signals        |    <0.001 |      416 |       --- |             --- |
 | I/O            |    <0.001 |       37 |       210 |           17.62 |
 | Static Power   |     0.097 |          |           |                 |
-| Total          |     0.101 |          |           |                 |
+| Total          |     0.102 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -71,7 +72,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.018 |       0.003 |      0.015 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.019 |       0.004 |      0.015 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.018 |       0.000 |      0.018 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.004 |       0.000 |      0.004 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -137,11 +138,10 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+---------+-----------+
-| Name    | Power (W) |
-+---------+-----------+
-| BBa     |     0.004 |
-|   IN105 |     0.001 |
-+---------+-----------+
++------+-----------+
+| Name | Power (W) |
++------+-----------+
+| BBa  |     0.004 |
++------+-----------+
 
 

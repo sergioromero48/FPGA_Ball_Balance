@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: UTSA
-// Engineer: Morton
+// Engineering Team: Group 6
+// Engineers: Sergio R, Sergio C, Marwa Y, Natalia L, Brandon C, 
 //
 // Create Date: 11/08/2024 02:33:37 PM
 //////////////////////////////////////////////////////////////////////////////////
@@ -22,6 +23,10 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     reg RTrig;
     reg [31:0] RPeriod;
     wire [31:0] Period;
+    
+    reg RPeriod_valid = 1'b0;
+    reg [31:0] RPeriod_latched = 32'd0;
+
 
     assign State = NextState;
     assign Trig = RTrig;
@@ -38,10 +43,11 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
         count <= count + 1;
         case (State)
             4'h0: begin // Initialize Trig, Interval, others
-                RTrig = 1'b0; // Use blocking here
-                RPeriod = 1'b0;
-                count <= 32'h00000000; // Reset count
-                NextState = 4'h1; // Jump to the next state
+                RTrig <= 1'b0;
+                RPeriod <= 32'd0;
+                RPeriod_valid <= 1'b0;
+                count <= 32'd0;
+                NextState <= 4'h1; // Jump to the next state
             end
             4'h1: begin
                 if (count < 32'd1_000) begin
@@ -55,12 +61,18 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
                 end
             end
             4'h2: begin
+                RPeriod_latched <= RPeriod; // Latch the valid RPeriod
+                RPeriod_valid <= 1'b1;      // Indicate RPeriod is valid
                 NextState <= 4'h0;
             end
         endcase
     end
+    
+    wire [31:0] OPeriod;
+    // Moving Average Filter for Stable PID and Sensor reading
+    moving_avg m0 ( clk100, RPeriod_valid, RPeriod_latched, OPeriod );
 
-    SSEG IN106 (seg, disp, clk100, RPeriod);
+    SSEG IN106 (seg, disp, clk100, OPeriod);
 endmodule
 
 // ***********************************************************
@@ -93,13 +105,13 @@ module PWM_Gen(clk100, Input, PWM_Pulse);
 endmodule
 
 // ***********************************************************
-
+// seg, disp, clk100, RPeriod
 module SSEG(seg, disp, clk100, BCD);
-    input wire clk100;
-    input wire [15:0] BCD;
     output reg [7:0] seg;
     output reg [7:0] disp;
-    reg [3:0] Location = 0;
+    input wire clk100;
+    input wire [31:0] BCD;
+    reg [7:0] Location = 0;
     reg [3:0] Digit;
 
     initial begin
@@ -152,6 +164,22 @@ module SSEG(seg, disp, clk100, BCD);
                 disp <= 8'b11110111;
                 {seg[7], Digit} <= {1'b1, BCD[15:12]};
             end
+            4: begin
+                disp <= 8'b11101111;
+                {seg[7], Digit} <= {1'b1, BCD[19:16]};
+            end
+            5: begin
+                disp <= 8'b11011111;
+                {seg[7], Digit} <= {1'b1, BCD[23:20]};
+            end
+            6: begin
+                disp <= 8'b10111111;
+                {seg[7], Digit} <= {1'b1, BCD[27:24]};
+            end
+            7: begin
+                disp <= 8'b01111111;
+                {seg[7], Digit} <= {1'b1, BCD[31:28]};
+            end
             default: disp <= 8'b11111111;
         endcase
     end
@@ -171,9 +199,47 @@ module CLK100MHZ_divider(clk100, New_Clock);
 
     always @(posedge clk100) begin
         count <= count + 1;
-        if (count == 31'd10_000) begin
+        if (count == 31'd5_000) begin
             New_Clock <= ~New_Clock; // Toggle New Clock
             count <= 31'b0; // Reset count
         end
     end
 endmodule
+
+module moving_avg (
+    input wire clk,                  // Clock signal
+    input wire enable,               // Enable signal
+    input wire [31:0] uint32_i,      // 32-bit unsigned input
+    output reg [31:0] uint32_o       // 32-bit unsigned output
+);
+    reg [33:0] sum = 34'd0;          // 34-bit accumulator to prevent overflow
+    reg [1:0] count = 2'd0;          // Sample count
+
+
+    always @(posedge clk) begin
+        if (enable) begin
+            case (count)
+                2'd0: begin
+                    sum <= sum + uint32_i; // Add input to sum
+                    count <= 2'd1;        // Move to the next state
+                end
+                2'd1: begin
+                    sum <= sum + uint32_i;
+                    count <= 2'd2;
+                end
+                2'd2: begin
+                    sum <= sum + uint32_i;
+                    count <= 2'd3;
+                end
+                2'd3: begin
+                    uint32_o <= sum >> 2; // Divide sum by 4 using bit-shift
+                    sum <= 34'd0;         // Reset sum for next cycle
+                    count <= 2'd0;        // Reset state
+                end
+            endcase
+        end
+    end
+endmodule
+
+
+
