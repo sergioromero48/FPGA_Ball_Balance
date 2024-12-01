@@ -72,8 +72,8 @@ endmodule
 module PID_Controller(
     input  clk,
     input  rst_n,
-    input  [15:0] setpoint,
-    input  [15:0] feedback, //ball distance
+    input  [31:0] setpoint,
+    input  [31:0] feedback, //ball distance
     input  [15:0] Kp,
     input  [15:0] Ki,
     input  [15:0] Kd,
