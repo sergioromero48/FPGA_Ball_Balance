@@ -38,10 +38,9 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     assign TestA1 = count[19];
     
     reg [31:0] SetPoint = 32'h00020590;
-    reg [31:0] Kp = 32'h000050000;
-    reg [31:0] Ki = 32'h000000100;
-    reg [31:0] Kd = 32'h000005000;
-    
+    reg [31:0] Kp = 32'd1000;             // Lowered Kp
+    reg [31:0] Ki = 32'd0;             // Ki can be zero initially
+    reg [31:0] Kd = 32'd0;             // Kd can be zero initially
 
     always @(posedge clk100) begin // State machine for the project
         count <= count + 1;
@@ -73,14 +72,18 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     end
     
     wire [31:0] OPeriod;
-    // Moving Average Filter for Stable PID and Sensor reading
-    moving_avg m0 ( clk100, RPeriod_valid, RPeriod_latched, OPeriod );
-    // PID Controller
-    PID_Controller PID ( clk100, rst_n, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
-    // PWM Generator
-    PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM);
+    wire [16:0] control_signal;
     
-    SSEG IN106 (seg, disp, clk100, OPeriod);
+    // Moving Average Filter for Stable PID and Sensor reading
+    moving_avg m0 ( clk100, RPeriod_valid, RPeriod_latched, OPeriod ); 
+    // PID Controller
+    PID_Controller PID ( clk100, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
+    // PWM Generator
+    // PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM);
+    PWM_Gen pwm1 ( clk100, {control_signal, 4'b0000}, PWM );
+    
+    //SSEG IN106 (seg, disp, clk100, OPeriod);
+    SSEG IN106 (seg, disp, clk100, control_signal);
 endmodule
 
 // ***********************************************************
@@ -111,6 +114,7 @@ module PWM_Gen(clk100, Input, PWM_Pulse);
         else PWM_Pulse = 0;
     end
 endmodule
+
 
 // ***********************************************************
 // seg, disp, clk100, RPeriod
@@ -248,37 +252,34 @@ module moving_avg (
         end
     end
 endmodule
+
 // PID_Controller PID ( clk100, rst_n, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
 module PID_Controller(
     input  wire         clk,
-    input  wire         rst_n,
     input  wire signed [31:0] setpoint,
-    input  wire signed [31:0] feedback,       // Ball distance
+    input  wire signed [31:0] feedback,
     input  wire signed [31:0] Kp,
     input  wire signed [31:0] Ki,
     input  wire signed [31:0] Kd,
-    input  wire         RPeriod_valid,        // New input signal
-    output reg  signed [31:0] control_signal
+    input  wire         RPeriod_valid,
+    output reg  [15:0]  control_signal  // Changed to 16-bit unsigned
 );
     // Internal signals
-    reg signed [31:0] prev_error    = 32'sd0;
-    reg signed [63:0] integral      = 64'sd0;  // Increased width to prevent overflow
-    reg signed [31:0] derivative    = 32'sd0;
+    reg signed [31:0] prev_error = 32'sd0;
+    reg signed [63:0] integral   = 64'sd0;
+    reg signed [31:0] derivative = 32'sd0;
 
     // Variables used in always block
     reg signed [31:0] error;
     reg signed [63:0] P_term;
     reg signed [63:0] PID_sum;
+    reg [15:0] PID_scaled;
 
-    // PID computation
-    always @(posedge clk or negedge rst_n) begin
-        if (~rst_n) begin
-            // Reset logic
-            prev_error     <= 32'sd0;
-            integral       <= 64'sd0;
-            derivative     <= 32'sd0;
-            control_signal <= 32'sd0;
-        end else if (RPeriod_valid) begin
+    // Scaling factor to match 16-bit output
+    parameter integer SCALING_SHIFT = 10;  // Adjust this value as needed
+
+    always @(posedge clk) begin
+        if (RPeriod_valid) begin
             // Calculate error
             error <= setpoint - feedback;
 
@@ -294,17 +295,19 @@ module PID_Controller(
             // Update previous error
             prev_error <= error;
 
-            // Calculate control signal
-            // Sum P, I, D terms and truncate to 32 bits if necessary
+            // Calculate PID sum
             PID_sum <= P_term + integral + derivative;
 
-            // Assign control signal with saturation to prevent overflow
-            if (PID_sum > 32'sh7FFFFFFF)
-                control_signal <= 32'sh7FFFFFFF;
-            else if (PID_sum < -32'sh80000000)
-                control_signal <= -32'sh80000000;
+            // Scale PID sum to 16-bit range
+            PID_scaled <= PID_sum >>> SCALING_SHIFT;  // Right shift to reduce magnitude
+
+            // Assign control signal with saturation
+            if (PID_scaled > 16'd65535)
+                control_signal <= 16'd65535;
+            else if (PID_scaled < 16'd0)
+                control_signal <= 16'd0;
             else
-                control_signal <= PID_sum[31:0];  // Truncate to 32 bits
+                control_signal <= PID_scaled[15:0];
         end
     end
 endmodule

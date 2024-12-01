@@ -1,75 +1,45 @@
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="8516" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="4280" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="16000" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="22024" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="11416" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="9792" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="11112" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="16812" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="3144" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="11308" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="8920" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="19824" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="18788" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="12356" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="13048" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="2868" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
 <?xml version="1.0"?>
 <ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="22040" HostCore="22" HostMemory="025095512064">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="6516" HostCore="22" HostMemory="025095512064">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="17588" HostCore="22" HostMemory="025095512064">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="528" HostCore="22" HostMemory="025095512064">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="12060" HostCore="22" HostMemory="025095512064">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="20224" HostCore="22" HostMemory="025095512064">
-    </Process>
-</ProcessHandle>
-<?xml version="1.0"?>
-<ProcessHandle Version="1" Minor="0">
-    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="21424" HostCore="22" HostMemory="025095512064">
+    <Process Command="vivado.bat" Owner="sergi" Host="MARVIN" Pid="7100" HostCore="22" HostMemory="025095512064">
     </Process>
 </ProcessHandle>
