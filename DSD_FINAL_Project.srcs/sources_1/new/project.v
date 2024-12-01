@@ -6,8 +6,8 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     output [7:0] seg; //displays
     output [7:0] disp; //individual displays
     output PWM; //pulse signal
-    output Trig;
-    input Echo;
+    output Trig; 
+    input Echo; //time recieved back
     //output red1;
     output TestA1;
     
@@ -35,7 +35,7 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     assign TestA1 = count[19];
 
     PWM_Gen IN105 (clk100, output_signal, PWM); // Replace the concatenation with the PID output
-    PID_Controller IN107 (clk100, 1'b0, 20'h16598, RPeriod, Kp, Ki, Kd, clk100, output_signal);
+    PID_Controller IN107 (clk100, 1'b0, 32'h00020590, RPeriod, Kp, Ki, Kd, clk100, output_signal);
 
     always @(posedge clk100) begin // State machine for the project
         count <= count + 1;
