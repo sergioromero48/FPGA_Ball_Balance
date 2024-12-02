@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
-| Date         : Sun Dec  1 23:18:04 2024
+| Date         : Sun Dec  1 23:21:37 2024
 | Host         : Marvin running 64-bit major release  (build 9200)
 | Command      : report_utilization -file BBa_utilization_placed.rpt -pb BBa_utilization_placed.pb
 | Design       : BBa
@@ -32,8 +32,8 @@ Table of Contents
 +-------------------------+------+-------+------------+-----------+-------+
 |        Site Type        | Used | Fixed | Prohibited | Available | Util% |
 +-------------------------+------+-------+------------+-----------+-------+
-| Slice LUTs              |  600 |     0 |          0 |     63400 |  0.95 |
-|   LUT as Logic          |  600 |     0 |          0 |     63400 |  0.95 |
+| Slice LUTs              |  598 |     0 |          0 |     63400 |  0.94 |
+|   LUT as Logic          |  598 |     0 |          0 |     63400 |  0.94 |
 |   LUT as Memory         |    0 |     0 |          0 |     19000 |  0.00 |
 | Slice Registers         |  706 |     0 |          0 |    126800 |  0.56 |
 |   Register as Flip Flop |  706 |     0 |          0 |    126800 |  0.56 |
@@ -72,9 +72,9 @@ Table of Contents
 | Slice                                      |  260 |     0 |          0 |     15850 |  1.64 |
 |   SLICEL                                   |  165 |     0 |            |           |       |
 |   SLICEM                                   |   95 |     0 |            |           |       |
-| LUT as Logic                               |  600 |     0 |          0 |     63400 |  0.95 |
+| LUT as Logic                               |  598 |     0 |          0 |     63400 |  0.94 |
 |   using O5 output only                     |    0 |       |            |           |       |
-|   using O6 output only                     |  456 |       |            |           |       |
+|   using O6 output only                     |  454 |       |            |           |       |
 |   using O5 and O6                          |  144 |       |            |           |       |
 | LUT as Memory                              |    0 |     0 |          0 |     19000 |  0.00 |
 |   LUT as Distributed RAM                   |    0 |     0 |            |           |       |
@@ -189,7 +189,7 @@ Table of Contents
 | LUT3     |   99 |                 LUT |
 | LUT4     |   63 |                 LUT |
 | LUT6     |   53 |                 LUT |
-| LUT1     |   40 |                 LUT |
+| LUT1     |   38 |                 LUT |
 | FDSE     |   32 |        Flop & Latch |
 | OBUF     |   19 |                  IO |
 | DSP48E1  |   12 |    Block Arithmetic |

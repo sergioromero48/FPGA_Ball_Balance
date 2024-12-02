@@ -37,7 +37,7 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
 
     assign TestA1 = count[19];
     
-    reg [31:0] SetPoint = 32'h00026000;
+    reg [31:0] SetPoint = 32'h00025900;
     reg [31:0] Kp = 32'd76;             // Lowered Kp
     reg [31:0] Ki = 32'd0;
     reg [31:0] Kd = 32'd9177;

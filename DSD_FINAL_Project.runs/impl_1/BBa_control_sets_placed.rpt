@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
-| Date         : Sun Dec  1 23:18:04 2024
+| Date         : Sun Dec  1 23:21:37 2024
 | Host         : Marvin running 64-bit major release  (build 9200)
 | Command      : report_control_sets -verbose -file BBa_control_sets_placed.rpt
 | Design       : BBa
@@ -81,14 +81,14 @@ Table of Contents
 |  clk100_IBUF_BUFG   |                                |                                     |                4 |              6 |         1.50 |
 |  clk100_IBUF_BUFG   | RPeriod_valid_reg_n_0          | PID/control_signal[15]_i_1_n_0      |                4 |             16 |         4.00 |
 |  IN106/IN432476/CLK |                                |                                     |                3 |             16 |         5.33 |
-|  clk100_IBUF_BUFG   |                                | clk0/count[31]_i_1_n_0              |                9 |             32 |         3.56 |
 |  clk100_IBUF_BUFG   |                                | count0                              |                8 |             32 |         4.00 |
 |  clk100_IBUF_BUFG   |                                | IN106/IN432476/New_Clock            |                9 |             32 |         3.56 |
+|  clk100_IBUF_BUFG   |                                | clk0/count[31]_i_1_n_0              |                9 |             32 |         3.56 |
 |  clk100_IBUF_BUFG   | m0/uint32_o[31]_i_1_n_0        |                                     |                9 |             32 |         3.56 |
 |  clk100_IBUF_BUFG   | RPeriod                        | count0                              |                8 |             32 |         4.00 |
 |  clk100_IBUF_BUFG   | RPeriod_latched                |                                     |                8 |             32 |         4.00 |
-|  slow_clk_BUFG      |                                |                                     |                6 |             32 |         5.33 |
 |  nclk_BUFG          |                                | nolabel_line91/count[31]_i_1__0_n_0 |                9 |             32 |         3.56 |
+|  slow_clk_BUFG      |                                |                                     |                6 |             32 |         5.33 |
 |  clk100_IBUF_BUFG   | m0/FSM_onehot_count[3]_i_1_n_0 | m0/sum[34]_i_1_n_0                  |                9 |             35 |         3.89 |
 |  clk100_IBUF_BUFG   | RPeriod_valid_reg_n_0          | PID/integral[63]_i_1_n_0            |               25 |             63 |         2.52 |
 |  clk100_IBUF_BUFG   |                                | pwm1/p_0_in                         |               17 |             64 |         3.76 |
