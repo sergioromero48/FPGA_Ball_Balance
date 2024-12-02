@@ -37,39 +37,40 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
 
     assign TestA1 = count[19];
     
-    reg [31:0] SetPoint = 32'h00020590;
-    reg [31:0] Kp = 32'd1000;             // Lowered Kp
+    reg [31:0] SetPoint = 32'h0002A010;
+    reg [31:0] Kp = 32'd76;             // Lowered Kp
     reg [31:0] Ki = 32'd0;             // Ki can be zero initially
-    reg [31:0] Kd = 32'd0;             // Kd can be zero initially
+    reg [31:0] Kd = 32'd9177;             // Kd can be zero initially
 
     always @(posedge clk100) begin // State machine for the project
-        count <= count + 1;
-        case (State)
-            4'h0: begin // Initialize Trig, Interval, others
+    count <= count + 1;
+    case (State)
+        4'h0: begin // Initialize Trig, Interval, others
+            RTrig <= 1'b0;
+            RPeriod <= 32'd0;
+            RPeriod_valid <= 1'b0;
+            count <= 32'd0;
+            NextState <= 4'h1; // Jump to the next state
+        end
+        4'h1: begin
+            if (count < 32'd1_000) begin
+                RTrig <= 1'b1;
+                RPeriod <= 32'h00000000;
+            end else if ((count >= 32'd1_000) && (count < 32'd250_000)) begin // Reduced from 6,000,000
                 RTrig <= 1'b0;
-                RPeriod <= 32'd0;
-                RPeriod_valid <= 1'b0;
-                count <= 32'd0;
-                NextState <= 4'h1; // Jump to the next state
+                if (Echo == 1) RPeriod <= RPeriod + 32'd1;
+            end else begin
+                NextState <= 4'h2;
             end
-            4'h1: begin
-                if (count < 32'd1_000) begin
-                    RTrig <= 1'b1;
-                    RPeriod <= 32'h00000000;
-                end else if ((count >= 32'd1_000) && (count < 32'd6_000_000)) begin
-                    RTrig <= 1'b0;
-                    if (Echo == 1) RPeriod <= RPeriod + 32'd1;
-                end else begin
-                    NextState <= 4'h2;
-                end
-            end
-            4'h2: begin
-                RPeriod_latched <= RPeriod; // Latch the valid RPeriod
-                RPeriod_valid <= 1'b1;      // Indicate RPeriod is valid
-                NextState <= 4'h0;
-            end
-        endcase
-    end
+        end
+        4'h2: begin
+            RPeriod_latched <= RPeriod; // Latch the valid RPeriod
+            RPeriod_valid <= 1'b1;      // Indicate RPeriod is valid
+            NextState <= 4'h0;
+        end
+    endcase
+end
+
     
     wire [31:0] OPeriod;
     wire [16:0] control_signal;
@@ -78,15 +79,34 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
     moving_avg m0 ( clk100, RPeriod_valid, RPeriod_latched, OPeriod ); 
     // PID Controller
     PID_Controller PID ( clk100, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
+    //PID_Controller PID ( clk100, SetPoint, OPeriod, 32'd76, 32'd0, 32'd9177, RPeriod_valid, control_signal );
     // PWM Generator
     // PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM);
     PWM_Gen pwm1 ( clk100, {control_signal, 4'b0000}, PWM );
     
+    wire nclk, slow_clk;
+    wire [31:0] sPeriod;
+    
+    CLK100MHZ_divider clk0 (clk100, nclk);
+    CLK100MHZ_divider( nclk, slow_clk );
+    
+    sample s0 (slow_clk, OPeriod, sPeriod);
+    
     //SSEG IN106 (seg, disp, clk100, OPeriod);
-    SSEG IN106 (seg, disp, clk100, control_signal);
+    SSEG IN106 (seg, disp, clk100, sPeriod);
 endmodule
 
 // ***********************************************************
+
+module sample (clk, in, out);
+    input wire clk;
+    input wire [31:0] in;
+    output reg [31:0] out;
+    
+    always @ (posedge clk) begin
+        out <= in;
+    end
+endmodule
 
 module PWM_Gen(clk100, Input, PWM_Pulse);
     input clk100;
@@ -224,8 +244,8 @@ module moving_avg (
     input wire [31:0] uint32_i,      // 32-bit unsigned input
     output reg [31:0] uint32_o       // 32-bit unsigned output
 );
-    reg [33:0] sum = 34'd0;          // 34-bit accumulator to prevent overflow
-    reg [1:0] count = 2'd0;          // Sample count
+    reg [35:0] sum = 34'd0;          // 36-bit accumulator to prevent overflow
+    reg [2:0] count = 2'd0;          // Sample count
 
 
     always @(posedge clk) begin
@@ -244,7 +264,7 @@ module moving_avg (
                     count <= 2'd3;
                 end
                 2'd3: begin
-                    uint32_o <= sum >> 2; // Divide sum by 4 using bit-shift
+                    uint32_o <= sum >> 3; // Divide sum by 4 using bit-shift
                     sum <= 34'd0;         // Reset sum for next cycle
                     count <= 2'd0;        // Reset state
                 end
@@ -258,25 +278,31 @@ module PID_Controller(
     input  wire         clk,
     input  wire signed [31:0] setpoint,
     input  wire signed [31:0] feedback,
-    input  wire signed [31:0] Kp,
-    input  wire signed [31:0] Ki,
-    input  wire signed [31:0] Kd,
+    input  wire [31:0] Kp,
+    input  wire [31:0] Ki,
+    input  wire [31:0] Kd,
     input  wire         RPeriod_valid,
-    output reg  [15:0]  control_signal  // Changed to 16-bit unsigned
+    output reg  [15:0]  control_signal  // 16-bit unsigned
 );
     // Internal signals
-    reg signed [31:0] prev_error = 32'sd0;
-    reg signed [63:0] integral   = 64'sd0;
-    reg signed [31:0] derivative = 32'sd0;
+    reg signed [31:0] prev_error = 32'sh00000000;
+    reg signed [63:0] integral   = 64'sh0000000000000000;
+    reg signed [31:0] derivative = 32'sh00000000;
 
     // Variables used in always block
     reg signed [31:0] error;
     reg signed [63:0] P_term;
+    reg signed [63:0] I_term;
+    reg signed [63:0] D_term;
     reg signed [63:0] PID_sum;
-    reg [15:0] PID_scaled;
+    reg signed [31:0] PID_scaled;
 
     // Scaling factor to match 16-bit output
     parameter integer SCALING_SHIFT = 10;  // Adjust this value as needed
+
+    // Anti-windup limits
+    parameter signed [63:0] MAX_INTEGRAL = 64'sh000000000000FFFF; // Example limit
+    parameter signed [63:0] MIN_INTEGRAL = -64'sh000000000000FFFF; // Example limit
 
     always @(posedge clk) begin
         if (RPeriod_valid) begin
@@ -284,28 +310,37 @@ module PID_Controller(
             error <= setpoint - feedback;
 
             // Proportional term
-            P_term <= Kp * error;
+            P_term <= $signed(Kp) * $signed(error);
 
-            // Integral term
-            integral <= integral + (Ki * error);
+            // Integral term with anti-windup
+            integral <= integral + ($signed(Ki) * $signed(error));
+
+            // Apply anti-windup limits
+            if (integral > MAX_INTEGRAL)
+                integral <= MAX_INTEGRAL;
+            else if (integral < MIN_INTEGRAL)
+                integral <= MIN_INTEGRAL;
+
+            I_term <= integral;
 
             // Derivative term
-            derivative <= Kd * (error - prev_error);
+            derivative <= error - prev_error;
+            D_term <= $signed(Kd) * $signed(derivative);
 
             // Update previous error
             prev_error <= error;
 
             // Calculate PID sum
-            PID_sum <= P_term + integral + derivative;
+            PID_sum <= P_term + I_term + D_term;
 
             // Scale PID sum to 16-bit range
             PID_scaled <= PID_sum >>> SCALING_SHIFT;  // Right shift to reduce magnitude
 
             // Assign control signal with saturation
-            if (PID_scaled > 16'd65535)
-                control_signal <= 16'd65535;
-            else if (PID_scaled < 16'd0)
-                control_signal <= 16'd0;
+            if (PID_scaled > 32'sh0000FFFF)
+                control_signal <= 16'hFFFF;
+            else if (PID_scaled < 32'sh00000000)
+                control_signal <= 16'h0000;
             else
                 control_signal <= PID_scaled[15:0];
         end
