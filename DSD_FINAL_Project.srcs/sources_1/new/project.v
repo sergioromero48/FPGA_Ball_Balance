@@ -37,10 +37,10 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
 
     assign TestA1 = count[19];
     
-    reg [31:0] SetPoint = 32'h0002A010;
+    reg [31:0] SetPoint = 32'h00026000;
     reg [31:0] Kp = 32'd76;             // Lowered Kp
-    reg [31:0] Ki = 32'd0;             // Ki can be zero initially
-    reg [31:0] Kd = 32'd9177;             // Kd can be zero initially
+    reg [31:0] Ki = 32'd0;
+    reg [31:0] Kd = 32'd9177;
 
     always @(posedge clk100) begin // State machine for the project
     count <= count + 1;

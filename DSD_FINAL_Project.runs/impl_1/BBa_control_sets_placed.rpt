@@ -1,0 +1,98 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
+| Date         : Sun Dec  1 23:18:04 2024
+| Host         : Marvin running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file BBa_control_sets_placed.rpt
+| Design       : BBa
+| Device       : xc7a100t
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Total control sets                                       |    20 |
+|    Minimum number of control sets                        |    20 |
+|    Addition due to synthesis replication                 |     0 |
+|    Addition due to physical synthesis replication        |     0 |
+| Unused register locations in slices containing registers |    38 |
++----------------------------------------------------------+-------+
+* Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
+** Run report_qor_suggestions for automated merging and remapping suggestions
+
+
+2. Histogram
+------------
+
++--------------------+-------+
+|       Fanout       | Count |
++--------------------+-------+
+| Total control sets |    20 |
+| >= 0 to < 4        |     3 |
+| >= 4 to < 6        |     2 |
+| >= 6 to < 8        |     1 |
+| >= 8 to < 10       |     0 |
+| >= 10 to < 12      |     0 |
+| >= 12 to < 14      |     0 |
+| >= 14 to < 16      |     0 |
+| >= 16              |    14 |
++--------------------+-------+
+* Control sets can be remapped at either synth_design or opt_design
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |              55 |           14 |
+| No           | No                    | Yes                    |               0 |            0 |
+| No           | Yes                   | No                     |             192 |           52 |
+| Yes          | No                    | No                     |             311 |           88 |
+| Yes          | No                    | Yes                    |               0 |            0 |
+| Yes          | Yes                   | No                     |             148 |           48 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++---------------------+--------------------------------+-------------------------------------+------------------+----------------+--------------+
+|     Clock Signal    |          Enable Signal         |           Set/Reset Signal          | Slice Load Count | Bel Load Count | Bels / Slice |
++---------------------+--------------------------------+-------------------------------------+------------------+----------------+--------------+
+|  clk100_IBUF_BUFG   | RPeriod_valid_reg_n_0          | PID/integral[0]_i_1_n_0             |                1 |              1 |         1.00 |
+|  clk100_IBUF_BUFG   | RTrig                          | count0                              |                1 |              1 |         1.00 |
+|  nclk_BUFG          |                                |                                     |                1 |              1 |         1.00 |
+|  clk100_IBUF_BUFG   | m0/FSM_onehot_count[3]_i_1_n_0 |                                     |                1 |              4 |         4.00 |
+|  IN106/IN432476/CLK | IN106/Digit[3]_i_1_n_0         |                                     |                3 |              5 |         1.67 |
+|  clk100_IBUF_BUFG   |                                |                                     |                4 |              6 |         1.50 |
+|  clk100_IBUF_BUFG   | RPeriod_valid_reg_n_0          | PID/control_signal[15]_i_1_n_0      |                4 |             16 |         4.00 |
+|  IN106/IN432476/CLK |                                |                                     |                3 |             16 |         5.33 |
+|  clk100_IBUF_BUFG   |                                | clk0/count[31]_i_1_n_0              |                9 |             32 |         3.56 |
+|  clk100_IBUF_BUFG   |                                | count0                              |                8 |             32 |         4.00 |
+|  clk100_IBUF_BUFG   |                                | IN106/IN432476/New_Clock            |                9 |             32 |         3.56 |
+|  clk100_IBUF_BUFG   | m0/uint32_o[31]_i_1_n_0        |                                     |                9 |             32 |         3.56 |
+|  clk100_IBUF_BUFG   | RPeriod                        | count0                              |                8 |             32 |         4.00 |
+|  clk100_IBUF_BUFG   | RPeriod_latched                |                                     |                8 |             32 |         4.00 |
+|  slow_clk_BUFG      |                                |                                     |                6 |             32 |         5.33 |
+|  nclk_BUFG          |                                | nolabel_line91/count[31]_i_1__0_n_0 |                9 |             32 |         3.56 |
+|  clk100_IBUF_BUFG   | m0/FSM_onehot_count[3]_i_1_n_0 | m0/sum[34]_i_1_n_0                  |                9 |             35 |         3.89 |
+|  clk100_IBUF_BUFG   | RPeriod_valid_reg_n_0          | PID/integral[63]_i_1_n_0            |               25 |             63 |         2.52 |
+|  clk100_IBUF_BUFG   |                                | pwm1/p_0_in                         |               17 |             64 |         3.76 |
+|  clk100_IBUF_BUFG   | RPeriod_valid_reg_n_0          |                                     |               67 |            238 |         3.55 |
++---------------------+--------------------------------+-------------------------------------+------------------+----------------+--------------+
+
+
