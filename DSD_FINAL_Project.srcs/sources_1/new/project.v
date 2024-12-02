@@ -1,50 +1,56 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: UTSA
+// Engineering Team: Group 6
+// Engineers: Sergio R, Sergio C, Marwa Y, Natalia L, Brandon C, 
+//
+// Create Date: 11/08/2024 02:33:37 PM
+//////////////////////////////////////////////////////////////////////////////////
 
 module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
-    input clk100; //updater clock
-    input [15:0] sw; //Switches for control
-    output [7:0] seg; //displays
-    output [7:0] disp; //individual displays
-    output PWM; //pulse signal
-    output Trig; 
-    input Echo; //time recieved back
+    input clk100;
+    input [15:0] sw;
+    output [7:0] seg;
+    output [7:0] disp;
+    output PWM;
+    output Trig;
+    input Echo;
     //output red1;
     output TestA1;
-    
-    wire [15:0] output_signal;
     reg [31:0] count;
     reg [3:0] NextState;
     wire [3:0] State;
     reg RTrig;
     reg [31:0] RPeriod;
     wire [31:0] Period;
-    reg [15:0] Kp;
-    reg [15:0] Ki;
-    reg [15:0] Kd;
+    
+    reg RPeriod_valid = 1'b0;
+    reg [31:0] RPeriod_latched = 32'd0;
+
 
     assign State = NextState;
     assign Trig = RTrig;
 
     initial begin
         NextState <= 4'h0;
-        Kp <= 16'd1;
-        Ki <= 16'd1;
-        Kd <= 16'd1;
     end
 
     assign TestA1 = count[19];
-
-    PWM_Gen IN105 (clk100, output_signal, PWM); // Replace the concatenation with the PID output
-    PID_Controller IN107 (clk100, 1'b0, 32'h00020590, RPeriod, Kp, Ki, Kd, clk100, output_signal);
+    
+    reg [31:0] SetPoint = 32'h00020590;
+    reg [31:0] Kp = 32'd5;             // Lowered Kp
+    reg [31:0] Ki = 32'd1;             // Ki can be zero initially
+    reg [31:0] Kd = 32'd1;             // Kd can be zero initially
 
     always @(posedge clk100) begin // State machine for the project
         count <= count + 1;
         case (State)
             4'h0: begin // Initialize Trig, Interval, others
-                RTrig = 1'b0; // Use blocking here
-                RPeriod = 1'b0;
-                count <= 32'h00000000; // Reset count
-                NextState = 4'h1; // Jump to the next state
+                RTrig <= 1'b0;
+                RPeriod <= 32'd0;
+                RPeriod_valid <= 1'b0;
+                count <= 32'd0;
+                NextState <= 4'h1; // Jump to the next state
             end
             4'h1: begin
                 if (count < 32'd1_000) begin
@@ -58,70 +64,29 @@ module BBa(clk100, sw, seg, disp, PWM, Trig, Echo, /*red1,*/ TestA1);
                 end
             end
             4'h2: begin
+                RPeriod_latched <= RPeriod; // Latch the valid RPeriod
+                RPeriod_valid <= 1'b1;      // Indicate RPeriod is valid
                 NextState <= 4'h0;
             end
         endcase
     end
-
-    SSEG IN106 (seg, disp, clk100, RPeriod); //RPeriod is the value
     
+    wire [31:0] OPeriod;
+    wire [16:0] control_signal;
+    
+    // Moving Average Filter for Stable PID and Sensor reading
+    moving_avg m0 ( clk100, RPeriod_valid, RPeriod_latched, OPeriod ); 
+    // PID Controller
+    PID_Controller PID ( clk100, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
+    // PWM Generator
+    // PWM_Gen IN105 (clk100, {sw, 4'b0000}, PWM);
+    PWM_Gen pwm1 ( clk100, {control_signal, 4'b0000}, PWM );
+    
+    //SSEG IN106 (seg, disp, clk100, OPeriod);
+    SSEG IN106 (seg, disp, clk100, control_signal);
 endmodule
 
 // ***********************************************************
-
-module PID_Controller(
-    input  clk,
-    input  rst_n,
-    input  [31:0] setpoint,
-    input  [31:0] feedback, //ball distance
-    input  [15:0] Kp,
-    input  [15:0] Ki,
-    input  [15:0] Kd,
-    input  [15:0] clk_prescaler,
-    output reg [15:0] control_signal
-);
-    // Internal signals
-    
-    reg [15:0] prev_error = 16'h0000;
-    reg [15:0] integral = 32'h00000000;
-    reg [15:0] derivative = 16'h0000;
-    
-    // Clock divider for sampling rate
-    reg [15:0] clk_divider = 0;
-    reg sampling_flag = 0;
-
-    always @(posedge clk or negedge rst_n) begin
-    //$display("Clock trigered");
-        if (~rst_n)
-            clk_divider <= 16'h0000;
-        else if (clk_divider == clk_prescaler) begin // clk_prescaler determines the sampling rate, thus sampling rate would be clk freq/clk_prescaler
-            clk_divider <= 16'h0000;
-            
-            sampling_flag <= 1;
-        end else begin
-            clk_divider <= clk_divider + 1;
-            sampling_flag <= 0;
-        end
-    end
-
-    always @(posedge clk or negedge rst_n) begin
-    
-        if (~rst_n) begin
-            // Reset logic generally specific to application
-            
-        end 
-        else if (sampling_flag) begin
-                      
-            // PID Calculation
-            integral <= integral + (Ki * (setpoint - feedback));
-            $display("Integral is %d",integral);
-            derivative <= Kd * ((setpoint - feedback) - prev_error);
-            // Calculate control signal
-            control_signal = (Kp * (setpoint - feedback)) + integral + derivative; 
-            prev_error <= (setpoint - feedback); // Update previous error term to feed it for derrivative term.
-        end
-    end
-endmodule
 
 module PWM_Gen(clk100, Input, PWM_Pulse);
     input clk100;
@@ -150,14 +115,15 @@ module PWM_Gen(clk100, Input, PWM_Pulse);
     end
 endmodule
 
-// ***********************************************************
 
+// ***********************************************************
+// seg, disp, clk100, RPeriod
 module SSEG(seg, disp, clk100, BCD);
-    input wire clk100;
-    input wire [15:0] BCD;
     output reg [7:0] seg;
     output reg [7:0] disp;
-    reg [3:0] Location = 0;
+    input wire clk100;
+    input wire [31:0] BCD;
+    reg [7:0] Location = 0;
     reg [3:0] Digit;
 
     initial begin
@@ -210,6 +176,22 @@ module SSEG(seg, disp, clk100, BCD);
                 disp <= 8'b11110111;
                 {seg[7], Digit} <= {1'b1, BCD[15:12]};
             end
+            4: begin
+                disp <= 8'b11101111;
+                {seg[7], Digit} <= {1'b1, BCD[19:16]};
+            end
+            5: begin
+                disp <= 8'b11011111;
+                {seg[7], Digit} <= {1'b1, BCD[23:20]};
+            end
+            6: begin
+                disp <= 8'b10111111;
+                {seg[7], Digit} <= {1'b1, BCD[27:24]};
+            end
+            7: begin
+                disp <= 8'b01111111;
+                {seg[7], Digit} <= {1'b1, BCD[31:28]};
+            end
             default: disp <= 8'b11111111;
         endcase
     end
@@ -229,9 +211,103 @@ module CLK100MHZ_divider(clk100, New_Clock);
 
     always @(posedge clk100) begin
         count <= count + 1;
-        if (count == 31'd10_000) begin
+        if (count == 31'd2_500) begin
             New_Clock <= ~New_Clock; // Toggle New Clock
             count <= 31'b0; // Reset count
+        end
+    end
+endmodule
+
+module moving_avg (
+    input wire clk,                  // Clock signal
+    input wire enable,               // Enable signal
+    input wire [31:0] uint32_i,      // 32-bit unsigned input
+    output reg [31:0] uint32_o       // 32-bit unsigned output
+);
+    reg [33:0] sum = 34'd0;          // 34-bit accumulator to prevent overflow
+    reg [1:0] count = 2'd0;          // Sample count
+
+
+    always @(posedge clk) begin
+        if (enable) begin
+            case (count)
+                2'd0: begin
+                    sum <= sum + uint32_i; // Add input to sum
+                    count <= 2'd1;        // Move to the next state
+                end
+                2'd1: begin
+                    sum <= sum + uint32_i;
+                    count <= 2'd2;
+                end
+                2'd2: begin
+                    sum <= sum + uint32_i;
+                    count <= 2'd3;
+                end
+                2'd3: begin
+                    uint32_o <= sum >> 2; // Divide sum by 4 using bit-shift
+                    sum <= 34'd0;         // Reset sum for next cycle
+                    count <= 2'd0;        // Reset state
+                end
+            endcase
+        end
+    end
+endmodule
+
+// PID_Controller PID ( clk100, rst_n, SetPoint, OPeriod, Kp, Ki, Kd, RPeriod_valid, control_signal );
+module PID_Controller(
+    input  wire         clk,
+    input  wire signed [31:0] setpoint,
+    input  wire signed [31:0] feedback,
+    input  wire signed [31:0] Kp,
+    input  wire signed [31:0] Ki,
+    input  wire signed [31:0] Kd,
+    input  wire         RPeriod_valid,
+    output reg  [15:0]  control_signal  // Changed to 16-bit unsigned
+);
+    // Internal signals
+    reg signed [31:0] prev_error = 32'sd0;
+    reg signed [63:0] integral   = 64'sd0;
+    reg signed [31:0] derivative = 32'sd0;
+
+    // Variables used in always block
+    reg signed [31:0] error;
+    reg signed [63:0] P_term;
+    reg signed [63:0] PID_sum;
+    reg [15:0] PID_scaled;
+
+    // Scaling factor to match 16-bit output
+    parameter integer SCALING_SHIFT = 10;  // Adjust this value as needed
+
+    always @(posedge clk) begin
+        if (RPeriod_valid) begin
+            // Calculate error
+            error <= setpoint - feedback;
+
+            // Proportional term
+            P_term <= Kp * error;
+
+            // Integral term
+            integral <= integral + (Ki * error);
+
+            // Derivative term
+            derivative <= Kd * (error - prev_error);
+
+            // Update previous error
+            prev_error <= error;
+
+            // Calculate PID sum
+            PID_sum <= P_term + integral + derivative;
+
+            // Scale PID sum to 16-bit range
+            PID_scaled <= PID_sum >>> SCALING_SHIFT;  // Right shift to reduce magnitude
+
+            // Assign control signal with saturation
+            if (PID_scaled > 16'd65535)
+                control_signal <= 16'd65535;
+            else if (PID_scaled < 16'd0)
+                control_signal <= 16'd0;
+            else
+                control_signal <= PID_scaled[15:0];
         end
     end
 endmodule
